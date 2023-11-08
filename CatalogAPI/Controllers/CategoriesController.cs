@@ -21,7 +21,15 @@ namespace CatalogAPI.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<Category>> Get()
         {
-            return _context.Categories.ToList();
+            try
+            {
+                return _context.Categories.AsNoTracking().ToList();
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "An error ocurred");
+            }
         }
 
         [HttpGet("{id:int}", Name="ObtainCategory")]
@@ -38,7 +46,8 @@ namespace CatalogAPI.Controllers
         [HttpGet("products")]
         public ActionResult<IEnumerable<Category>> GetCategoriesProducts()
         {
-            return _context.Categories.Include(p =>  p.Products).ToList();
+            return _context.Categories.Include(p => p.Products).AsNoTracking().ToList();
+            // return _context.Categories.Include(p => p.Products).Where(c => c.CategoryId <= 5).ToList();
         }
 
         [HttpPost]
